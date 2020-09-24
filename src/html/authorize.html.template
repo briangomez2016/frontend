@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LA POSTERGADA</title>
+    <link rel="preload" href="<%= latestPageJS %>" as="script" crossorigin="use-credentials" />
+    <%= renderTemplate('_header') %>
+    <style>
+      .content {
+        padding: 20px 16px;
+        max-width: 360px;
+        margin: 0 auto;
+      }
+
+      .header {
+        font-size: 1.96em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 300;
+      }
+
+      .header img {
+        margin-right: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <div class="header">
+        <img src="/static/icons/favicon-192x192.png" height="240" />
+      </div>
+      <ha-authorize><p>Inicializando</p></ha-authorize>
+    </div>
+
+    <%= renderTemplate('_js_base') %>
+    <%= renderTemplate('_preload_roboto') %>
+
+    <script type="module" crossorigin="use-credentials">
+      import "<%= latestPageJS %>";
+      window.providersPromise = fetch("/auth/providers", {
+        credentials: "same-origin",
+      });
+    </script>
+
+    <script nomodule>
+      (function() {
+        // Safari 10.1 supports type=module but ignores nomodule, so we add this check.
+        if (!isS101) {
+          _ls("/static/polyfills/custom-elements-es5-adapter.js");
+          <% if (useRollup) { %>
+            _ls("/static/js/s.min.js").onload = function() {
+              System.import("<%= es5PageJS %>");
+            }
+          <% } else { %>
+            _ls("<%= es5PageJS %>");
+          <% } %>
+        }
+      })();
+    </script>
+  </body>
+</html>
